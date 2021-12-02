@@ -110,3 +110,10 @@ reject ：失败的回调
 
     相同点：都可以调用函数一次，都可以篡改函数的上下文一次
     不同点：call和apply传递参数，call的参数用逗号隔开，apply的参数用数组
+
+## nprogress 请求时顶部的进度条插件
+
+一般在发请求 api 时使用
+nprogress.start:进度条的开始
+nprogress.done:进度条的结束
+一定要引入样式！！可以在样式文件中改进度条的颜色
