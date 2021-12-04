@@ -1,22 +1,22 @@
 //home的小仓库
-import {reqCotegoryList} from '@/api/service/reqCotegoryList'
+import {reqCategoryList} from '@/api/service/reqCategoryList'
 //state :仓库存放数据的地方
 const state = {
-    cotegoryList:[]
+    categoryList:[]
 }
 //mutations :唯一修改state的地方
 const mutations = {
-    COTEGORYLIST(state,cotegoryList){
-        state.cotegoryList = cotegoryList
+    CATEGORYLIST(state,categoryList){
+        state.categoryList = categoryList
     }
 }
 //actions :处理state，也可以书写自己的业务逻辑，还有异步处理
 const actions = {
-    async cotegoryList({commit}){
-        let result = await reqCotegoryList()
+    async categoryList({commit}){
+        let result = await reqCategoryList()
         console.log(result)
         if(result.code == 200){
-            commit('COTEGORYLIST',result.data)
+            commit('CATEGORYLIST',result.data)
         }
     }
 }

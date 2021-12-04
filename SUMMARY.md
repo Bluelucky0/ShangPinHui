@@ -117,3 +117,34 @@ reject ：失败的回调
 nprogress.start:进度条的开始
 nprogress.done:进度条的结束
 一定要引入样式！！可以在样式文件中改进度条的颜色
+
+## 三级联动路由跳转
+
+1、声明式路由导航：每次操作的时候都要渲染组件，当数量很多时，就会很耗内存，而且操作频率过快的时候，会出现卡顿现象
+2、编程式路由导航：要为每一个 a 标签绑定回调事件，当数量很多时也会很麻烦
+3、事件委派：给共同的父元素绑定回调事件，值绑定一次，但是每次触发的时候，父元素下面所有的后代元素都有肯触发回调，而且不能区分出一级、二级、三级菜单
+4、使用编程式导航+事件委派
+使用自定义属性
+
+    goSearch(event) {
+      let element = event.target;
+      let { categoryname, category1id, category2id, category3id } =
+        element.dataset;
+      if (categoryname) {
+        //整理路由跳转的参数
+        let location = { name: "search" };
+        let query = { categoryName: categoryname };
+        //判断一级二级三级分类
+        if (category1id) {
+          query.category1Id = category1id;
+        } else if (category2id) {
+          query.category2Id = category2id;
+        } else {
+          query.category3Id = category3id;
+        }
+
+        //合并参数
+        location.query = query;
+        this.$router.push(location);
+      }
+    },
