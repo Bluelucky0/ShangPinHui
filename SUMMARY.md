@@ -46,7 +46,7 @@ this.$router.push({path:'search',params:{keyword:this.keyword},query:{k:this.key
 ## 3、params 参数可以传参也可以不传参，但如果传参为空串，如何解决？
 
 答：undefined
-this.$router.push({name:'search',params:{keyword:''||undefined},query:{k:this.keyword.toUppercase()}})
+this.$router.push({name:'search',params:{keyword: this.keyword||undefined},query:{k:this.keyword.toUppercase()}})
 
 ## 4、路由组件能不能传递 props 数据？
 
@@ -71,6 +71,13 @@ props:($route)=>{
            return {keyword:$route.params.keyword,k:$route.query.k}
 }
 }
+
+## 注册全局组件 在 main.js 中
+
+第一个参数：全局组件的名字 第二个参数： 哪一个组件
+
+    import TypeNav from '@/components/TypeNav'
+    Vue.component(TypeNav.name,TypeNav)
 
 ## 重写 push|replace
 
@@ -148,3 +155,57 @@ nprogress.done:进度条的结束
         this.$router.push(location);
       }
     },
+
+## 过渡动画效果注意点
+
+使用过渡动画的前提是 组件|元素务必要有 v-if|v-show 指令才可以进行过渡动画
+
+## swiper 插件 轮播图使用总结
+
+在首页轮播图中使用插件 swiper，在组件中引入插件，但是样式需要在入口文件 main.js 中引入，只引一次
+
+在组件中，new Swiper 实例：
+1、在 mounted 挂载完毕之后去 new swiper 实例
+问题----在 mounted 中有异步请求 dispatch，所以在 mounted 运行完之后数据还未请求回来，导致轮播图不能用
+2、在 update 钩子中，new Swiper 实例，可以实现但是当 data 中有数据并重新渲染时，就要重新在 new Swiper 实例一次
+3、在 mounted 钩子中加一个定时器，在定时器里面 new Swiper 实例，但是会导致渲染时要等设置时间之后彩可以用
+4、watch 和 nextTick,用 watch 监听 bannersList 的变化，用 nextTixk 保证动态渲染之后异步请求的数据已经回来了,保证结构已经存在了
+
+    watch: {
+      bannersList: {
+        handler(newValue, oldValue) {
+          //使用watch和nextTick实现轮播，用watch监听bannersList的变化，用nextTixk保证动态渲染之后异步请求的数据已经回来了，结构已经有了
+          this.$nextTick(() => {
+            var mySwiper = new Swiper(".swiper-container", {
+              loop: true, // 循环模式选项
+              // 如果需要分页器
+              pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+              },
+              // 如果需要前进后退按钮
+              navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+              },
+            });
+          });
+        },
+      },
+    },
+
+## 仓库的数据格式
+
+    仓库中的state的数据格式取决于服务器返回的数据格式
+    如果返回的是数组格式，那仓库里面就写数组格式---XXX:[],对象模式---XXX:{}
+
+## v-for 也可以在自定义标签当中使用（组件标签）
+
+  <MyHeader v-for="(item,index) in XXX" :key='xxx' />
+
+## 拆分全局组件
+
+    在开发当中，如果看到某一个组件在很多地方都使用，就把他变成全局组件，注册一次，可以在任何地方使用，
+    共用的组件或非路由组件一定要放到components文件夹中
+
+## 写静态---API---仓库三连环（action，commit，state）---捞数据（组件获取仓库数据）---动态展示数据

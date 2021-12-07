@@ -6,8 +6,8 @@
     <Recommend />
     <Rank />
     <Like />
-    <Floor />
-    <Floor />
+    <!-- 在父组件里面进行，对子组件进行遍历，然后通过props把值传给组件floor -->
+    <Floor v-for="(floor, index) in floorsList" :key="floor.id" :list="floor" />
     <Brand />
   </div>
 </template>
@@ -19,6 +19,7 @@ import Like from "./Like";
 import ListContainer from "./ListContainer";
 import Rank from "./Rank";
 import Recommend from "./Recommend";
+import { mapState } from "vuex";
 export default {
   name: "Home",
   components: {
@@ -28,6 +29,14 @@ export default {
     ListContainer,
     Rank,
     Recommend,
+  },
+  mounted() {
+    this.$store.dispatch("floorsList");
+  },
+  computed: {
+    ...mapState({
+      floorsList: (state) => state.home.floorsList,
+    }),
   },
 };
 </script>

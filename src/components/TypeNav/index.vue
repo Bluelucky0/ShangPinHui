@@ -2,52 +2,54 @@
   <div class="type-nav">
     <div class="container">
       <!-- 用事件委派来清除鼠标移出效果  -->
-      <div @mouseleave="closeIndex">
+      <div @mouseleave="leaveShow" @mouseenter="enterShow">
         <h2 class="all">全部商品分类</h2>
-        <div class="sort">
-          <div class="all-sort-list2" @click="goSearch">
-            <div
-              class="item"
-              v-for="(c1, index) in categoryList"
-              :key="c1.categoryId"
-              :class="{ cur: getIndex == index }"
-            >
-              <h3 @mouseenter="changeIndex(index)">
-                <a
-                  :data-categoryName="c1.categoryName"
-                  :data-category1Id="c1.categoryId"
-                  >{{ c1.categoryName }}</a
-                >
-              </h3>
+        <!-- 加过渡动画 -->
+        <transition name="sort">
+          <div class="sort" v-show="show">
+            <div class="all-sort-list2" @click="goSearch">
               <div
-                class="item-list clearfix"
-                :style="{ display: getIndex == index ? 'block' : 'none' }"
+                class="item"
+                v-for="(c1, index) in categoryList"
+                :key="c1.categoryId"
+                :class="{ cur: getIndex == index }"
               >
+                <h3 @mouseenter="changeIndex(index)">
+                  <a
+                    :data-categoryName="c1.categoryName"
+                    :data-category1Id="c1.categoryId"
+                    >{{ c1.categoryName }}</a
+                  >
+                </h3>
                 <div
-                  class="subitem"
-                  v-for="(c2, index) in c1.categoryChild"
-                  :key="c2.categoryId"
+                  class="item-list clearfix"
+                  :style="{ display: getIndex == index ? 'block' : 'none' }"
                 >
-                  <dl class="fore">
-                    <dt>
-                      <a
-                        :data-categoryName="c2.categoryName"
-                        :data-category2Id="c2.categoryId"
-                        >{{ c2.categoryName }}</a
-                      >
-                    </dt>
-                    <dd>
-                      <em
-                        v-for="(c3, index) in c2.categoryChild"
-                        :key="c3.categoryId"
-                      >
+                  <div
+                    class="subitem"
+                    v-for="(c2, index) in c1.categoryChild"
+                    :key="c2.categoryId"
+                  >
+                    <dl class="fore">
+                      <dt>
                         <a
-                          :data-categoryName="c3.categoryName"
-                          :data-category3Id="c3.categoryId"
-                          >{{ c3.categoryName }}</a
+                          :data-categoryName="c2.categoryName"
+                          :data-category2Id="c2.categoryId"
+                          >{{ c2.categoryName }}</a
                         >
-                      </em>
-                      <!-- <em>
+                      </dt>
+                      <dd>
+                        <em
+                          v-for="(c3, index) in c2.categoryChild"
+                          :key="c3.categoryId"
+                        >
+                          <a
+                            :data-categoryName="c3.categoryName"
+                            :data-category3Id="c3.categoryId"
+                            >{{ c3.categoryName }}</a
+                          >
+                        </em>
+                        <!-- <em>
                       <a href="">文学</a>
                     </em>
                     <em>
@@ -56,12 +58,12 @@
                     <em>
                       <a href="">畅读VIP</a>
                     </em> -->
-                    </dd>
-                  </dl>
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
-            </div>
-            <!-- <div class="item">
+              <!-- <div class="item">
             <h3>
               <a href="">家用电器</a>
             </h3>
@@ -420,8 +422,9 @@
               </div>
             </div>
           </div> -->
+            </div>
           </div>
-        </div>
+        </transition>
       </div>
       <nav class="nav">
         <a href="###">服装城</a>
@@ -447,10 +450,17 @@ export default {
   data() {
     return {
       getIndex: -1,
+      show: true,
     };
   },
   mounted() {
-    this.$store.dispatch("categoryList");
+    //把请求数据放在app.js中，mounted只会挂载一次，挂载完成去请求数据也是请求一次，
+    //而在组件中，每次跳转的时候都要重新挂载，会很好性能
+    // this.$store.dispatch("categoryList");
+    //跳转到search路由时，mounted会重新渲染，所以判断不为home路由时，三级菜单隐藏
+    if (this.$route.path != "/home") {
+      this.show = false;
+    }
   },
   computed: {
     ...mapState({
@@ -467,9 +477,9 @@ export default {
     changeIndex: throttle(function (index) {
       this.getIndex = index;
     }, 50),
-    closeIndex() {
-      this.getIndex = -1;
-    },
+    // closeIndex() {
+    //   this.getIndex = -1;
+    // },
     goSearch(event) {
       //使用event获取到触发回调的元素
       let element = event.target;
@@ -490,8 +500,24 @@ export default {
         }
 
         //合并参数
-        location.query = query;
+        //在search组件中，我们只传了params参数，而在TypeNav中，我们只传了query参数，当实际跳转的时候，
+        //两者只能存在一个，如果我们需要两种参数的结合体去请求数据，就不能实现，所以我们要合并params和query参数
+        if(this.$route.params){
+          location.params = this.$route.params
+          location.query = query;
+        }
+        
         this.$router.push(location);
+      }
+    },
+    enterShow() {
+      this.show = true;
+    },
+    leaveShow() {
+      this.getIndex = -1;
+      //在search路由中，鼠标离开时要隐藏菜单，而home路由不需要
+      if (this.$route.path != "/home") {
+        this.show = false;
       }
     },
   },
@@ -542,7 +568,7 @@ export default {
       .all-sort-list2 {
         .item {
           h3 {
-            line-height: 30px;
+            line-height: 27.5px;
             font-size: 14px;
             font-weight: 400;
             overflow: hidden;
@@ -613,6 +639,23 @@ export default {
         }
       }
     }
+
+    //过渡动画的样式
+    //开始
+    .sort-enter {
+      height: 0;
+    }
+    //结束
+    .sort-enter-to {
+      height: 462px;
+    }
+    //过渡动画
+    .sort-enter-active {
+      transition: all 0.5s linear;
+    }
+    // .sort-enter-to-active {
+    //   transition: all 0.5s linear;
+    // }
   }
 }
 </style>
