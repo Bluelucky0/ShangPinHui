@@ -4,7 +4,11 @@
       <div class="fl key brand">品牌</div>
       <div class="value logos">
         <ul class="logo-list">
-          <li v-for="(trademark, index) in trademarkList" :key="trademark.tmId">
+          <li
+            v-for="(trademark, index) in trademarkList"
+            :key="trademark.tmId"
+            @click="trademarkSearch(trademark)"
+          >
             {{ trademark.tmName }}
           </li>
         </ul>
@@ -22,7 +26,11 @@
       <div class="fl key">{{ attr.attrName }}</div>
       <div class="fl value">
         <ul class="type-list">
-          <li v-for="(attrValue, index) in attr.attrValueList" :key="index">
+          <li
+            v-for="(attrValue, index) in attr.attrValueList"
+            :key="index"
+            @click="attrInfo(attr, attrValue)"
+          >
             <a>{{ attrValue }}</a>
           </li>
         </ul>
@@ -38,6 +46,17 @@ export default {
   name: "SearchSelector",
   computed: {
     ...mapGetters(["attrsList", "trademarkList"]),
+  },
+  methods: {
+    //通过自定义事件给父元素传值
+    trademarkSearch(trademark) {
+      //触发自定义事件
+      this.$emit("trademarkInfo", trademark);
+    },
+    //品牌售卖属性，点击的时候要获取到点击的属于那个分类，点击的那个属性，如颜色分类，点击的是粉色
+    attrInfo(attr, attrValue) {
+      this.$emit("attrInfo", attr, attrValue);
+    },
   },
 };
 </script>

@@ -77,6 +77,12 @@ export default {
       }
     },
   },
+  mounted() {
+    //全局事件总线去监听clearkeyword  清除关键字
+    this.$bus.$on("clearKeyword", () => {
+      this.keyword = "";
+    });
+  },
 };
 </script>
 

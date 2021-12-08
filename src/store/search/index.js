@@ -14,7 +14,7 @@ const actions = {
     //参数至少为一个空对象，否则会报错
     async getSearchList({commit},params={}){
         let result = await reqGetSearchList(params)
-        console.log(result);
+        // console.log(result);
         if(result.code == 200){
             commit('SEARCHLIST',result.data)
         }

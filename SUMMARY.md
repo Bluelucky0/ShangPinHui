@@ -209,3 +209,7 @@ nprogress.done:进度条的结束
     共用的组件或非路由组件一定要放到components文件夹中
 
 ## 写静态---API---仓库三连环（action，commit，state）---捞数据（组件获取仓库数据）---动态展示数据
+
+## Object.assign es6 新增语法，和并对象，把后面的对象合并到第一个参数中
+
+    Object.assign(this.searchParams, this.$route.query, this.$route.params);

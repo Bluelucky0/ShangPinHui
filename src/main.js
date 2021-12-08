@@ -19,6 +19,10 @@ Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
+  //配置全局时间总线$bus
+  beforeMount(){
+    Vue.prototype.$bus = this
+  },
   router,
   store
 }).$mount('#app')
