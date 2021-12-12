@@ -2,10 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
-import Home from '@/pages/Home'
-import Search from '@/pages/Search'
-import Login from '@/pages/Login'
-import Register from '@/pages/Register'
+import routes from './routes'
+
 
 //重写push|replace
 // location :告诉原来的push方法，你往那边跳转（传递那些参数）
@@ -32,35 +30,9 @@ VueRouter.prototype.replace = function(location,resolve,reject){
 }
 
 export default new VueRouter({
-    routes:[
-        {
-            path:'*',
-            redirect:'/home'
-        },
-        {
-            path:'/home',
-            name:'Home',
-            component:Home,
-            //路由元组件  可以用来当footer组件是否显示的判断条件
-            meta:{show:true}
-        },
-        {
-            path:'/search/:keyword?',
-            name:'search',
-            component:Search,
-            meta:{show:true}
-        },
-        {
-            path:'/login',
-            name:'login',
-            component:Login,
-            meta:{show:false}
-        },
-        {
-            path:'/register',
-            name:'register',
-            component:Register,
-            meta:{show:false}
-        }
-    ]
+    routes,
+    // 当切换到新路由时，页面滚到顶部
+    scrollBehavior (to, from, savedPosition) {
+        return { y: 0 }
+      }
 })

@@ -48,7 +48,7 @@
             <div class="navbar-inner filter">
               <ul class="sui-nav">
                 <!-- 动态确定选中样式的显示 -->
-                <li :class="{ active: isOne }">
+                <li :class="{ active: isOne }" @click="changeOrder('1')">
                   <a>
                     综合
                     <!-- 图标  首先根据样式来显示图标  动态判断是显示向上图标还是向下图标-->
@@ -62,7 +62,7 @@
                     ></span
                   ></a>
                 </li>
-                <li :class="{ active: isTwo }">
+                <li :class="{ active: isTwo }" @click="changeOrder('2')">
                   <a>
                     价格
                     <span
@@ -87,9 +87,9 @@
               >
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="item.html" target="_blank"
-                      ><img :src="good.defaultImg"
-                    /></a>
+                    <router-link :to="`/detail/${good.id}`">
+                      <img :src="good.defaultImg"
+                    /></router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -123,35 +123,13 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div><span>共10页&nbsp;</span></div>
-            </div>
-          </div>
+          <Pagination
+            :pageNo="searchParams.pageNo"
+            :pageSize="searchParams.pageSize"
+            :continues="5"
+            :total="total"
+            @getPageNo="getPageNo"
+          />
         </div>
       </div>
     </div>
@@ -160,7 +138,7 @@
 
 <script>
 import SearchSelector from "./SearchSelector/SearchSelector";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default {
   name: "Search",
   components: {
@@ -181,7 +159,7 @@ export default {
         //当前第几页
         pageNo: 1,
         //一页展示多少个
-        pageSize: 10,
+        pageSize: 3,
         //平台售卖的属性参数
         props: [],
         //品牌
@@ -214,6 +192,9 @@ export default {
     isDesc() {
       return this.searchParams.order.indexOf("desc") != -1;
     },
+    ...mapState({
+      total: (state) => state.search.searchList.total,
+    }),
   },
   methods: {
     //向服务器发请求获取search数据，在mounted中请求只会发一次，但是我们需要根据不同的参数发多次请求
@@ -251,7 +232,7 @@ export default {
     //接受子组件传过来的参数
     trademarkInfo(trademark) {
       //对参数进行整理，格式为{ID：名字}
-      console.log(trademark);
+      // console.log(trademark);
       this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`;
       this.getData();
     },
@@ -266,6 +247,30 @@ export default {
     },
     removeAttrValue(index) {
       this.searchParams.props.splice(index, 1);
+      this.getData();
+    },
+    changeOrder(flag) {
+      //flag为点击时传过来的是综合（1）还是价格（2）
+      // let originOrder = this.searchParams.order
+      //取出原始的flag
+      let originFlag = this.searchParams.order.split(":")[0];
+      //取出原始的状态 升序（asc）还是降序(desc)
+      let originSort = this.searchParams.order.split(":")[1];
+      let newOrder = "";
+      //如果传过来的flag和原始的一样，说明点击的是同一个按钮，我们应该改变他的状态，如果不等于说明点击了另外一个按钮
+      if (flag == originFlag) {
+        //拼接新的order为1：asc这种形式
+        newOrder = `${originFlag}:${originSort == "desc" ? "asc" : "desc"}`;
+      } else {
+        newOrder = `${flag}:${"desc"}`;
+      }
+      //把新的赋给原来的，并重新发起请求
+      this.searchParams.order = newOrder;
+      this.getData();
+    },
+    getPageNo(pageNo) {
+      //整理参数，从新发请求
+      this.searchParams.pageNo = pageNo;
       this.getData();
     },
   },

@@ -20,8 +20,8 @@ $router ：一般进行编程式导航时进行路由的跳转【push|replace】
 
 ## 路由传参？
 
-params 参数：属于路径当中的一部分，需要注意，在配置路由的时候，需要提前占位（path:'/home/params'）
-query 参数：不属于路径的一部分，类似于 ajax 中的 queryString,直接在后面？xx=xx&xx=xx，不需要提前占位
+params 参数：不属于路径当中的一部分，需要注意，在配置路由的时候，需要提前占位（path:'/home/params'）
+query 参数：属于路径的一部分，类似于 ajax 中的 queryString,直接在后面？xx=xx&xx=xx，不需要提前占位
 
 路由传参：
 第一种：字符串形式
@@ -125,6 +125,11 @@ nprogress.start:进度条的开始
 nprogress.done:进度条的结束
 一定要引入样式！！可以在样式文件中改进度条的颜色
 
+## 防抖和节流
+
+    节流：在规定的间隔时间范围不会重复触发回调，只有大于这个时间间隔才会触发回调，把频繁触发变为少量触发
+    防抖：前面所有的触发都被取消，最后一次在规定时间之后才会触发，也就是说如果连续快速的触发，只会执行一次
+
 ## 三级联动路由跳转
 
 1、声明式路由导航：每次操作的时候都要渲染组件，当数量很多时，就会很耗内存，而且操作频率过快的时候，会出现卡顿现象
@@ -162,14 +167,39 @@ nprogress.done:进度条的结束
 
 ## swiper 插件 轮播图使用总结
 
-在首页轮播图中使用插件 swiper，在组件中引入插件，但是样式需要在入口文件 main.js 中引入，只引一次
+## 仓库的数据格式
 
-在组件中，new Swiper 实例：
-1、在 mounted 挂载完毕之后去 new swiper 实例
-问题----在 mounted 中有异步请求 dispatch，所以在 mounted 运行完之后数据还未请求回来，导致轮播图不能用
-2、在 update 钩子中，new Swiper 实例，可以实现但是当 data 中有数据并重新渲染时，就要重新在 new Swiper 实例一次
-3、在 mounted 钩子中加一个定时器，在定时器里面 new Swiper 实例，但是会导致渲染时要等设置时间之后彩可以用
-4、watch 和 nextTick,用 watch 监听 bannersList 的变化，用 nextTixk 保证动态渲染之后异步请求的数据已经回来了,保证结构已经存在了
+    仓库中的state的数据格式取决于服务器返回的数据格式
+    如果返回的是数组格式，那仓库里面就写数组格式---XXX:[],对象模式---XXX:{}
+
+## v-for 也可以在自定义标签当中使用（组件标签）
+
+  <MyHeader v-for="(item,index) in XXX" :key='xxx' />
+
+## 拆分全局组件
+
+    在开发当中，如果看到某一个组件在很多地方都使用，就把他变成全局组件，注册一次，可以在任何地方使用，
+    共用的组件或非路由组件一定要放到components文件夹中
+
+## 写静态--->>写接口 API--->>仓库三连环（actions，mutations，state）--->>捞数据（组件获取仓库数据 dispatch）--->>动态展示数据
+
+## Object.assign es6 新增语法，和并对象，把后面的对象合并到第一个参数中
+
+    Object.assign(this.searchParams, this.$route.query, this.$route.params);
+
+## 轮播、分页、日历：
+
+## 轮播(carousel)
+
+总结：
+
+    在首页轮播图中使用插件 swiper，在组件中引入插件，但是样式需要在入口文件 main.js 中引入，只引一次
+    在组件中，new Swiper 实例之前，一定要确保结构已经存在：
+    1、在 mounted 挂载完毕之后去 new swiper 实例
+    问题----在 mounted 中有异步请求 dispatch，所以在 mounted 运行完之后数据还未请求回来，导致轮播图不能用
+    2、在 update 钩子中，new Swiper 实例，可以实现但是当 data 中有数据并重新渲染时，就要重新在 new Swiper 实例一次
+    3、在 mounted 钩子中加一个定时器，在定时器里面 new Swiper 实例，但是会导致渲染时要等设置时间之后才可以用
+    4、watch 和 nextTick,用 watch 监听 bannersList 的变化，用 nextTixk 保证动态渲染之后异步请求的数据已经回来了,保证结构已经存在了
 
     watch: {
       bannersList: {
@@ -194,22 +224,111 @@ nprogress.done:进度条的结束
       },
     },
 
-## 仓库的数据格式
+## 分页(pagination)
 
-    仓库中的state的数据格式取决于服务器返回的数据格式
-    如果返回的是数组格式，那仓库里面就写数组格式---XXX:[],对象模式---XXX:{}
+总结：
 
-## v-for 也可以在自定义标签当中使用（组件标签）
+pageNo:当前页数
+pageSize:一页显示多少条数据
+continues:连续页数，一般都为奇数 5、7 这种，因为对称、好看
+total:总共多少条数据
 
-  <MyHeader v-for="(item,index) in XXX" :key='xxx' />
+    props: ["pageNo", "pageSize", "continues", "total"],
+    computed: {
+      //根据数据计算总共有多少页 Math.ceil向上取整
+      totalPage() {
+        return Math.ceil(this.total / this.pageSize);
+      },
+      //分页器中间连续分页的开始页数和结束页数
+      startPageAndEndPage() {
+        //解构
+        const { continues, pageNo, totalPage } = this;
+        let start = 0,
+          end = 0;
+        //如果连续的分页数大于总共的页数，就让起始页为1，结束页为totalPage
+        if (continues > totalPage) {
+          start = 1;
+          end = totalPage;
+        } else {
+          //else说明连续的分页数小于总共的页数，起始页为当前页数减去连续页数除2的取整
+          start = pageNo - parseInt(continues / 2);
+          end = pageNo + parseInt(continues / 2);
+          //对上面的起始页和结束页进行纠正  两个极端
+          //当计算出来的起始页小于1时，就让起始页为1，结束页为连续页的大小
+          if (start < 1) {
+            start = 1;
+            end = continues;
+          }
+          //当计算出来的结束页大于总页数时，就让结束页为总共页数的大小，开始页为总共页数减去连续页数的大小加1
+          if (end > totalPage) {
+            end = totalPage;
+            start = totalPage - continues + 1;
+          }
+        }
+        return { start, end };
+      },
+    },
 
-## 拆分全局组件
+## 公共组件
 
-    在开发当中，如果看到某一个组件在很多地方都使用，就把他变成全局组件，注册一次，可以在任何地方使用，
-    共用的组件或非路由组件一定要放到components文件夹中
+    公共组件放到components文件夹下，并在main.js中全局注册，使用时直接写标签
 
-## 写静态---API---仓库三连环（action，commit，state）---捞数据（组件获取仓库数据）---动态展示数据
+import TypeNav from '@/components/TypeNav'
+import Carousel from '@/components/Carousel'
+import Pagination from '@/components/Pagination'
+Vue.component(TypeNav.name,TypeNav)
+Vue.component(Carousel.name,Carousel)
+Vue.component(Pagination.name,Pagination)
 
-## Object.assign es6 新增语法，和并对象，把后面的对象合并到第一个参数中
+## 假报错问题：控制台输出报错信息，但是不影响程序运行 往往都是请求的值还没回来，所以值为 undefined，对 undefined 做任何操作都会报错
 
-    Object.assign(this.searchParams, this.$route.query, this.$route.params);
+    computed: {
+        //子接收到父传过来的值，也是当数据还没回来的时候，skuImageList[0]对象是一个undefined，取属性值时为取undefined的值，所以会报错
+        //控制台的报错不会影响程序的运行，但是控制台会报红
+        //所以我们需要对skuImageList[0]对象进行加工，至少保证他是一个空对象
+        imgObj() {
+          return this.skuImageList[this.currentIndex] || {};
+        },
+      },
+      *****************************
+      categoryView(state){
+        //一定要加或为空对象，因为如果数据还没回来时，返回的就是一个undefined，而在页面上渲染返回的数据的属性值数据时undefined是没有的，所以控制台会报错
+        return state.goodsInfo.categoryView||{}
+    },
+
+## 本地存储（localStorage）和会话存储（sessionStorage）
+
+    本地存储：持久化存储-----5M
+    会话存储：非持久化----页面关闭数据就没了
+    注意！！！
+
+        两者都只能存储字符串形式，不能存储对象，不能存储对象，对象要进行转化
+        存---JSON.stringify转为字符串
+        取---JSON.parse转化为对象
+
+## 向服务器发送请求，不用返回数据，只返回操作是否成功，如加购物车，购物车列表是否选中（操作数据库）
+
+     //购物车列表是否勾选----在仓库中
+    async getUpdateCheckedById({commit},{skuId,isChecked}){
+        let result = await reqUpdateCheckById(skuId,isChecked)
+        if(result.code == 200){
+            return 'ok'
+        }else{
+            return Promise.reject(new Error('faile'))
+        }
+    }
+
+      //在组件中派发请求，要用async和await ，因为请求返回的是一个promise对象，我们只需要我们操作成功没，用try-catch去捕获错误
+     async UpdateChecked(cart, event) {
+      try {
+        //选中状态是一个布尔值，而我们给服务器发送的应该是1（被选中）、0（为被选中）
+        let isChecked = event.target.checked ? "1" : "0";
+        await this.$store.dispatch("getUpdateCheckedById", {
+          skuId: cart.skuId,
+          isChecked,
+        });
+        this.getData();
+      } catch (error) {
+        alert(error.message);
+      }
+    },
