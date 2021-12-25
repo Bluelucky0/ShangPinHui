@@ -32,6 +32,8 @@ export default {
   },
   mounted() {
     this.$store.dispatch("floorsList");
+    //用户登录成功之后派发请求获取用户的账户信息
+    // this.$store.dispatch("userInfo");
   },
   computed: {
     ...mapState({

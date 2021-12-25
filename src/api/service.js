@@ -15,6 +15,9 @@ service.interceptors.request.use((config)=>{
     if(store.state.detail.uuid_token){
         config.headers.UserTempId = store.state.detail.uuid_token
     }
+    if(store.state.user.token){
+        config.headers.token = store.state.user.token
+    }
      //进度条的开始
     nprogress.start()  
     return config

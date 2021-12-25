@@ -332,3 +332,49 @@ Vue.component(Pagination.name,Pagination)
         alert(error.message);
       }
     },
+
+## assets 专门用于存放组件公用的静态资源
+
+## @符号（src 别名）----在 js 中可以直接用，但在样式 css 中，前面需要加上~
+
+## token
+
+    用户登录成功的时候会返回一个token，我们存储到仓库中（非持久化存储，一刷新就会没掉），此时我们把token也存储到本地存储中，
+    在仓库中初始值token时去调用函数，从本地存储中取token的函数
+
+
+    import { setToken,getToken } from '../../utils/token'
+    const state ={
+        //初始值是没有的为null，第一次登录成功后会返回一个token会覆盖这个null，下次刷新后仓库中token没了，然后就通过getToken()调用本地存储的持久化token
+        token:getToken(),
+    }
+    const mutations={
+        USERLOGIN(state,token){
+            state.token = token
+        },
+    }
+    const actions={
+        //用户登录
+        async userLogin({commit},user){
+            let result = await reqUserLogin(user)
+            if(result.code == 200){
+                commit('USERLOGIN',result.data.token)
+                //服务器返回的token，调用setToken把token存储到本地存储中，存仓库中（非持久化存储）的时候也同时存储到了本地存储（持久化存储）
+                setToken(result.data.token)
+                return 'ok'
+            }else{
+                return Promise.reject(new Error('faile'))
+            }
+        },
+
+/utils/token.js
+
+      //存储token---调用的时候把token传进来
+      export const setToken = (token)=>{
+          localStorage.setItem('TOKEN',token)
+      }
+
+      //获取token
+      export const getToken = ()=>{
+          return localStorage.getItem('TOKEN')
+      }
