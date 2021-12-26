@@ -1,6 +1,7 @@
-import {reqCartList} from '@/api/service/reqCartList'
-import { reqDeleteCartById } from '@/api/service/reqDeleteCartById'
-import { reqUpdateCheckById } from '@/api/service/reqUpdateCheckById'
+// import {reqCartList} from '@/api/service/reqCartList'
+// import { reqDeleteCartById } from '@/api/service/reqDeleteCartById'
+// import { reqUpdateCheckById } from '@/api/service/reqUpdateCheckById'
+import {reqCartList,reqDeleteCartById,reqUpdateCheckById} from '../../api/service/shopcart'
 const state ={
     cartList:[]
 }

@@ -1,6 +1,7 @@
-import {reqGoodsInfo} from '../../api/service/reqGoodsInfo'
-import {reqAddOrUpdataShaopCart} from '../../api/service/reqAddOrUpdataShopCart'
+// import {reqGoodsInfo} from '../../api/service/reqGoodsInfo'
+// import {reqAddOrUpdataShaopCart} from '../../api/service/reqAddOrUpdataShopCart'
 import {getUUID} from '../../utils/uuid_token'
+import {reqGoodsInfo,reqAddOrUpdataShaopCart} from '../../api/service/detail'
 const state={
     goodsInfo:{},
     uuid_token:getUUID()

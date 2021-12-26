@@ -1,5 +1,6 @@
 //search的小仓库
-import { reqGetSearchList } from '@/api/service/reqSearchList'
+// import { reqGetSearchList } from '@/api/service/reqSearchList'
+import {reqGetSearchList} from '../../api/service/search'
 const state = {
     //根据服务器返回的数据格式来写
     searchList:{}

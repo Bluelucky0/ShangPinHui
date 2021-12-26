@@ -1,9 +1,11 @@
-import {reqGetCode} from '../../api/service/reqGetCode'
-import { reqUserRegister } from '../../api/service/reqUserRegister'
-import { reqUserLogin } from '../../api/service/reqUserLogin'
-import { reqUserInfo } from '../../api/service/reqUserInfo'
+// import {reqGetCode} from '../../api/service/reqGetCode'
+// import { reqUserRegister } from '../../api/service/reqUserRegister'
+// import { reqUserLogin } from '../../api/service/reqUserLogin'
+// import { reqUserInfo } from '../../api/service/reqUserInfo'
+// import {reqLogout} from '../../api/service/reqLogout'
 import { setToken,getToken,removeItem } from '../../utils/token'
-import {reqLogout} from '../../api/service/reqLogout'
+import {reqGetCode,reqUserRegister,reqUserLogin,reqUserInfo,reqLogout} from '../../api/service/user'
+
 const state ={
     code:'',
     //初始值是没有的为null，第一次登录成功后会返回一个token会覆盖这个null，下次刷新后仓库中token没了，然后就通过getToken()调用本地存储的持久化token
