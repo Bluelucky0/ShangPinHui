@@ -72,7 +72,15 @@ router.beforeEach(async (to, from, next) => {
     }
   } else {
     //else代表没有token，用户未登录
-    next();
+    // to.Path在获取未登录的情况下点击想去的页面
+    let toPath = to.path
+    //判断没有登录下要去交易页面/支付页面/个人中心页面等就跳转到登录页面
+    if(toPath.indexOf('/trade')!=-1||toPath.indexOf('/pay')!=-1||toPath.indexOf('/center')!=-1){
+      //登录成功后跳转到自己没有登录时想去的页面
+      next('/login?redirect='+toPath)
+    }else{
+      next()
+    }
   }
 });
 export default router;

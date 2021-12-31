@@ -19,7 +19,15 @@ Vue.prototype.$alert = MessageBox.alert;
 import '@/mock/mockServer'
 //引入swiper的样式
 import 'swiper/css/swiper.css'
+//引入图片懒加载插件
+import VueLazyload from 'vue-lazyload'
+import dlam from '@/assets/2.gif'
+Vue.use(VueLazyload,{
+      loading:dlam
+})
 
+//引入表单验证
+import '@/plugins/validate'
 //统一引入接口文件
 // import * as API from '@/api/service/index'
 

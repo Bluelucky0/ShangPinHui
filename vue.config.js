@@ -1,4 +1,6 @@
 module.exports = {
+    //在打包时不打包MAp文件
+    producetionSourceMap:false,
     //关闭eslint
     lintOnSave:false,
     //跨域代理   webpack.config.js文件就相当于vue.config.js文件

@@ -93,7 +93,8 @@ export default {
         const { phone, password } = this;
         await this.$store.dispatch("userLogin", { phone, password });
         //登录成功进行路由跳转
-        this.$router.push("/home");
+        let toPath = this.$route.query.redirect || "";
+        this.$router.push(toPath);
       } catch (error) {
         alert(error.message);
       }

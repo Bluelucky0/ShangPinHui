@@ -1,11 +1,3 @@
-import Home from '@/pages/Home'
-import Search from '@/pages/Search'
-import Login from '@/pages/Login'
-import Register from '@/pages/Register'
-import Detail from '@/pages/Detail'
-import AddCartSuccess from '@/pages/AddCartSuccess'
-import ShopCart from '@/pages/ShopCart'
-import Trade from '@/pages/Trade'
 import Pay from '@/pages/Pay'
 import PaySuccess from '@/pages/PaySuccess'
 import Center from '@/pages/Center'
@@ -20,57 +12,74 @@ export default[
     {
         path:'/home',
         name:'Home',
-        component:Home,
+        //路由懒加载，只有在使用的时候才引入
+        component:()=>import('@/pages/Home'),
         //路由元组件  可以用来当footer组件是否显示的判断条件
         meta:{show:true}
     },
     {
         path:'/search/:keyword?',
         name:'search',
-        component:Search,
+        component:()=>import('@/pages/Search'),
         meta:{show:true}
     },
     {
         path:'/login',
         name:'login',
-        component:Login,
+        component:()=>import('@/pages/Login'),
         meta:{show:false}
     },
     {
         path:'/register',
         name:'register',
-        component:Register,
+        component:()=>import('@/pages/Register'),
         meta:{show:false}
     },
     {
         path:'/detail/:skuid',
         name:'Detail',
-        component:Detail,
+        component:()=>import('@/pages/Detail'),
         meta:{show:true}
     },
     {
         path:'/addcartsuccess',
         name:'addcartsuccess',
-        component:AddCartSuccess,
+        component:()=>import('@/pages/AddCartSuccess'),
         meta:{show:true}
     },
     {
         path:'/shopcart',
         name:'shopcart',
-        component:ShopCart,
+        component:()=>import('@/pages/ShopCart'),
         meta:{show:true}
     },
     {
         path:'/trade',
         name:'trade',
-        component:Trade,
-        meta:{show:true}
+        component:()=>import('@/pages/Trade'),
+        meta:{show:true},
+        //路由独享守卫，进入这个路由的前提条件只能是从购物车过来的
+        beforeEnter: (to, from, next) => {
+            if(from.path == '/shopcart'){
+                next()
+            }else{
+                //代表从哪里还会到那去
+                next(false)
+            }
+        }
     },
     {
         path:'/pay',
         name:'pay',
         component:Pay,
-        meta:{show:true}
+        meta:{show:true},
+        beforeEnter: (to, from, next) => {
+            if(from.path == '/trade'){
+                next()
+            }else{
+                next(false)
+            }
+        }
     },
     {
         path:'/paysuccess',

@@ -30,3 +30,9 @@ export const reqPayStatus = (orderId)=>Service({
     url:`/payment/weixin/queryPayStatus/${orderId}`,
     method:'get'
 })
+
+//获取我的订单列表
+export const reqMyOrderList = (page,limit) =>Service({
+    url:`/order/auth/${page}/${limit}`,
+    method:'get'
+})
